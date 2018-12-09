@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+
+//Components
+import Product from '../product/product';
+import WishList from '../wishlist/wishlist';
+
+//Services
 import HttpService from '../services/http-server';
 
 const http = new HttpService();
@@ -9,18 +15,31 @@ class App extends Component {
 
   constructor(props){
     super();
-    
-    //Bing functions
+    this.state={products:[]};
+
+    //Bind functions
+    this.productList = this.productList.bind(this);
     this.loadData = this.loadData.bind(this);
     this.loadData();
   }
 
   loadData = () => {
-    http.getProducts().then(products=>{
-        console.log(products);
+    var self=this;
+    http.getProducts().then(data=>{
+        //console.log(products);
+        self.setState({products: data});
       },err=>{
 
       });
+  }
+
+  productList = () => {
+    const list = this.state.products.map((product)=>
+      <div className="col-sm-4" key={product._id}>
+        <Product product={product}/>
+      </div>
+    );
+    return (list);
   }
 
   render() {
@@ -40,6 +59,18 @@ class App extends Component {
             Learn React
           </a>
         </header>
+        <div className="container-fluid App-main">
+          <div className="row">
+            <div className="col-sm-8">
+              <div className="row">
+              {this.productList()}
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <WishList />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
